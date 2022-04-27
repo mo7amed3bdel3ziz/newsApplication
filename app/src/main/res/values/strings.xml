@@ -2,5 +2,6 @@
     <string name="app_name">newsApp</string>
     //api key from news api.org
     <string name="api_key">d481599262764edb9b6c213bd2601f18</string>
+<!--    <string name="api_key">331303f4d4a7435fa9ee432a8ab905ed</string>-->
 
 </resources>

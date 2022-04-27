@@ -6,11 +6,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.newsapp.models.NewsHeadlines;
+import com.example.newsapp.models.Article;
+import com.example.newsapp.models.Headline;
 import com.squareup.picasso.Picasso;
 
 public class DetailsActivity extends AppCompatActivity {
-    NewsHeadlines headlines;
+    Article headlines;
     TextView txt_title, txt_time, txt_content, txt_detail, txt_author;
     ImageView img_news;
 
@@ -26,13 +27,13 @@ public class DetailsActivity extends AppCompatActivity {
         txt_author=findViewById(R.id.text_details_author);
         img_news =findViewById(R.id.img_detail_news);
 
-        headlines = (NewsHeadlines) getIntent().getSerializableExtra("data");
+        headlines = (Article) getIntent().getSerializableExtra("data");
 
         txt_title.setText(headlines.getTitle());
-        txt_author.setText(headlines.getAuther());
+        txt_author.setText(headlines.getAuthor());
         txt_time.setText(headlines.getPublishedAt());
         txt_content.setText(headlines.getContent());
         txt_detail.setText(headlines.getDescription());
-        Picasso.get().load(headlines.getUriToImage()).into(img_news);
+        Picasso.get().load(headlines.getUrlToImage()).into(img_news);
     }
 }

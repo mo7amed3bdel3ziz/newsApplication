@@ -3,7 +3,7 @@ package com.example.newsapp;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.example.newsapp.models.NewsApiResponse;
+import com.example.newsapp.models.Headline;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,19 +23,23 @@ public class RequestManager {
 
     public void getNewHeadlines(OnFetchDataListener listener, String category, String query) {
         CallNewsApi callNewsApi = retrofit.create(CallNewsApi.class);
-        Call<NewsApiResponse> call = callNewsApi.CallHeadlines("us", category, query, context.getString(R.string.api_key));
+        Call<Headline> call = callNewsApi.getHeadlines("eg", context.getString(R.string.api_key));
         try {
-            call.enqueue(new Callback<NewsApiResponse>() {
+            call.enqueue(new Callback<Headline>() {
                 @Override
-                public void onResponse(Call<NewsApiResponse> call, Response<NewsApiResponse> response) {
+                public void onResponse(Call<Headline> call, Response<Headline> response) {
                     if (!response.isSuccessful()) {
                         Toast.makeText(context, "Error !", Toast.LENGTH_SHORT).show();
+                    } else if (response.body().getArticles() == null) {
+                        Toast.makeText(context, "Error !", Toast.LENGTH_SHORT).show();
+                    } else {
+                        listener.onFetchData(response.body().getArticles(), response.message());
                     }
-                    listener.onFetchData(response.body().getArticals(), response.message());
+
                 }
 
                 @Override
-                public void onFailure(Call<NewsApiResponse> call, Throwable t) {
+                public void onFailure(Call<Headline> call, Throwable t) {
                     listener.onError("Request failed");
                 }
             });
@@ -50,13 +54,7 @@ public class RequestManager {
 
     public interface CallNewsApi {
         @GET("top-headlines")
-        Call<NewsApiResponse> CallHeadlines(
-                @Query("country") String country,
-                @Query("category") String category,
-                @Query("q") String query,
-                @Query("apiKey") String api_key
-
-        );
+        Call<Headline> getHeadlines(@Query("country") String country, @Query("apiKey") String apiKey);
 
     }
 }

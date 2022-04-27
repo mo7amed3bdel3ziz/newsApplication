@@ -10,11 +10,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.newsapp.models.NewsApiResponse;
-import com.example.newsapp.models.NewsHeadlines;
+import com.example.newsapp.models.Article;
 
 import java.util.List;
 
@@ -29,13 +27,34 @@ public class MainActivity extends AppCompatActivity implements SelectLestener, V
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loadingShow();
+        search();
+        getArticlesRequest();
 
-        searchView =findViewById(R.id.search_view);
+        b1 = findViewById(R.id.btn_1);
+        b1.setOnClickListener(this);
+        b2 = findViewById(R.id.btn_2);
+        b2.setOnClickListener(this);
+        b3 = findViewById(R.id.btn_3);
+        b3.setOnClickListener(this);
+        b4 = findViewById(R.id.btn_4);
+        b4.setOnClickListener(this);
+        b5 = findViewById(R.id.btn_5);
+        b5.setOnClickListener(this);
+        b6 = findViewById(R.id.btn_6);
+        b6.setOnClickListener(this);
+        b7 = findViewById(R.id.btn_7);
+        b7.setOnClickListener(this);
+
+        RequestManager manager = new RequestManager(this);
+        manager.getNewHeadlines(listener, "general", null);
+    }
+
+    private void search() {
+        searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                dialog.setTitle("Fetching news articals"+query);
-                dialog.show();
                 RequestManager manager = new RequestManager(MainActivity.this);
                 manager.getNewHeadlines(listener, "general", query);
                 return true;
@@ -46,56 +65,38 @@ public class MainActivity extends AppCompatActivity implements SelectLestener, V
                 return false;
             }
         });
+    }
 
+    private void loadingShow() {
         dialog = new ProgressDialog(this);
-        dialog.setTitle("Fetching news articals..");
+        dialog.setTitle("Fetching news articals");
         dialog.show();
+    }
 
-        b1 = findViewById(R.id.btn_1);
-        b1.setOnClickListener(this);
-
-        b2 = findViewById(R.id.btn_2);
-        b1.setOnClickListener(this);
-
-        b3 = findViewById(R.id.btn_3);
-        b1.setOnClickListener(this);
-
-        b4 = findViewById(R.id.btn_4);
-        b1.setOnClickListener(this);
-
-        b5 = findViewById(R.id.btn_5);
-        b1.setOnClickListener(this);
-
-        b6 = findViewById(R.id.btn_6);
-        b1.setOnClickListener(this);
-
-        b7 = findViewById(R.id.btn_7);
-        b1.setOnClickListener(this);
-
+    private void getArticlesRequest() {
         RequestManager manager = new RequestManager(this);
         manager.getNewHeadlines(listener, "general", null);
     }
 
-    private final OnFetchDataListener<NewsApiResponse> listener = new OnFetchDataListener<NewsApiResponse>() {
+    private final OnFetchDataListener<Article> listener = new OnFetchDataListener<Article>() {
         @Override
-        public void onFetchData(List<NewsHeadlines> list, String massage) {
-            if (list.isEmpty()){
+        public void onFetchData(List<Article> list, String massage) {
+            if (list.isEmpty()) {
                 Toast.makeText(MainActivity.this, "no data found!", Toast.LENGTH_SHORT).show();
+            } else {
+                ShowNews(list);
             }
-            else {
-            ShowNews(list);
             dialog.dismiss();
-        }
         }
 
         @Override
         public void onError(String massage) {
             Toast.makeText(MainActivity.this, "an error occured!!", Toast.LENGTH_SHORT).show();
-
+            //   dialog.dismiss();
         }
     };
 
-    private void ShowNews(List<NewsHeadlines> list) {
+    private void ShowNews(List<Article> list) {
         adapter = new CustomAdapter(this, list, this);
         recyclerView = findViewById(R.id.recycler_main);
         recyclerView.setHasFixedSize(true);
@@ -104,26 +105,58 @@ public class MainActivity extends AppCompatActivity implements SelectLestener, V
 
 
 
-        /*/ recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        /* recyclerView.setLayoutManager(new LinearLayoutManager(this));
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);*/
 
     }
 
-    @Override
-    public void OnNewsClicked(NewsHeadlines headlines) {
-        startActivity(new Intent(MainActivity.this, DetailsActivity.class)
-                .putExtra("data", headlines));
-    }
 
     @Override
     public void onClick(View view) {
         Button button = (Button) view;
         String category = button.getText().toString();
-        dialog.setTitle("Fetching news articals of" + category);
+        switch (view.getId()) {
+            case R.id.btn_1:
+                setSearchTag(b1.getText().toString());
+
+                break;
+            case R.id.btn_2:
+                setSearchTag(b2.getText().toString());
+                break;
+            case R.id.btn_3:
+                setSearchTag(b3.getText().toString());
+                break;
+            case R.id.btn_4:
+                setSearchTag(b4.getText().toString());
+                break;
+            case R.id.btn_5:
+                setSearchTag(b5.getText().toString());
+                break;
+            case R.id.btn_6:
+                setSearchTag(b6.getText().toString());
+                break;
+            case R.id.btn_7:
+                setSearchTag(b7.getText().toString());
+                break;
+
+        }
+
+    }
+
+    private void setSearchTag(String category) {
+        dialog.setTitle("fitching news articles of " + category);
         dialog.show();
         RequestManager manager = new RequestManager(this);
         manager.getNewHeadlines(listener, category, null);
+
+    }
+
+    @Override
+    public void OnNewsClicked(Article headlines) {
+        startActivity(new Intent(MainActivity.this, DetailsActivity.class)
+                .putExtra("data", headlines));
+
     }
 }
